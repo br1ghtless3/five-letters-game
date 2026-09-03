@@ -1,6 +1,6 @@
 # Локально всё то же самое запускается одной командой: ./gradlew check
 
-image: library/eclipse-temurin:25-jdk
+image: "${GITLAB_DOCKER_PROXY}/library/eclipse-temurin:25-jdk"
 
 workflow:
   rules:
