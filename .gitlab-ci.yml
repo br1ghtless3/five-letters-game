@@ -1,6 +1,6 @@
 # Локально всё то же самое запускается одной командой: ./gradlew check
 
-image: eclipse-temurin:25-jdk
+image: library/eclipse-temurin:25-jdk
 
 workflow:
   rules:
