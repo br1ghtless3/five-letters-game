@@ -56,4 +56,23 @@ public class GameSession {
         String word = dictionary.getRandom(seed);
         return new GameSession(word, maxAttempts);
     }
+
+    public void progeressAttempt(String quess) {
+        if (status != GameStatus.IN_PROGRESS) {
+            throw new IllegalStateException("Игра была завершена, новые попытки не принимаются.");
+        }
+
+        if (quess == null || quess.length() != WORD_LENGTH) {
+            throw new IllegalArgumentException("Слово должно состоять из 5-ти букв.");
+        }
+
+        attemptsUsed++;
+        attemptsHistory.add(quess.toLowerCase());
+
+        if (quess.equalsIgnoreCase(answer)) {
+            status = GameStatus.WIN;
+        } else if (attemptsUsed >= maxAttempts) {
+            status = GameStatus.LOSE;
+        }
+    }
 }
