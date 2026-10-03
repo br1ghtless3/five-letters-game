@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class Dictionary {
@@ -20,12 +21,15 @@ public class Dictionary {
             throw new IllegalArgumentException("Переданный список пуст.");
         }
 
+        List<String> normalizedWords = new ArrayList<>();
+
         for (String word : words) {
             if (word == null || word.length() != WORD_LENGTH) {
                 throw new IllegalArgumentException("Длина слова должна составлять 5.");
             }
+            normalizedWords.add(word.toLowerCase(Locale.ROOT));
         }
-        this.words = List.copyOf(words);
+        this.words = List.copyOf(normalizedWords);
     }
 
     public List<String> getWords() {
@@ -52,7 +56,7 @@ public class Dictionary {
                     continue;
                 }
 
-                readerWords.add(line);
+                readerWords.add(line.toLowerCase(Locale.ROOT));
             }
 
             if (readerWords.size() < MIN_DICTIONARY_SIZE) {
@@ -73,5 +77,13 @@ public class Dictionary {
         var random = new Random(seed);
         var index = random.nextInt(words.size());
         return words.get(index);
+    }
+
+    // слово есть в словаре?
+    public boolean contains(String word) {
+        if (word == null) {
+            return false;
+        }
+        return words.contains(word.toLowerCase(Locale.ROOT));
     }
 }

@@ -12,8 +12,15 @@ public class GameSession {
     private final List<String> attemptsHistory = new ArrayList<>();
     private GameStatus status;
 
-    // конструктор самой сессии
+    private final WordValidator validator;
+
+    // конструктор самой сессии старый, ктр вызывает новый для тестов
     public GameSession(String answer, int maxAttempts) {
+        this(answer, maxAttempts, null);
+    }
+
+    // новый, ура
+    public GameSession(String answer, int maxAttempts, Dictionary dictionary) {
         if (answer == null || answer.length() != WORD_LENGTH) {
             throw new IllegalArgumentException("Передано некорректное слово. Слово должно состоять из 5-ти букв.");
         }
@@ -27,6 +34,8 @@ public class GameSession {
         this.status = GameStatus.IN_PROGRESS;
         this.answer = answer.toLowerCase();
         this.maxAttempts = maxAttempts;
+        this.validator = new WordValidator(dictionary);
+
     }
 
     public GameStatus getStatus() {
@@ -54,22 +63,20 @@ public class GameSession {
             throw new IllegalArgumentException("Словарь не может быть равен null.");
         }
         String word = dictionary.getRandom(seed);
-        return new GameSession(word, maxAttempts);
+        return new GameSession(word, maxAttempts, dictionary);
     }
 
-    public void progeressAttempt(String quess) {
+    public void applyGuess(String guess) {
         if (status != GameStatus.IN_PROGRESS) {
             throw new IllegalStateException("Игра была завершена, новые попытки не принимаются.");
         }
 
-        if (quess == null || quess.length() != WORD_LENGTH) {
-            throw new IllegalArgumentException("Слово должно состоять из 5-ти букв.");
-        }
+        String cleanGuess = validator.validate(guess);
 
         attemptsUsed++;
-        attemptsHistory.add(quess.toLowerCase());
+        attemptsHistory.add(cleanGuess.toLowerCase());
 
-        if (quess.equalsIgnoreCase(answer)) {
+        if (cleanGuess.equalsIgnoreCase(answer)) {
             status = GameStatus.WIN;
         } else if (attemptsUsed >= maxAttempts) {
             status = GameStatus.LOSE;
