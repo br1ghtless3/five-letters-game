@@ -2,6 +2,7 @@ package academy.fiveletters;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class GameSession {
     private static final int WORD_LENGTH = 5;
@@ -14,12 +15,6 @@ public class GameSession {
 
     private final WordValidator validator;
 
-    // конструктор самой сессии старый, ктр вызывает новый для тестов
-    public GameSession(String answer, int maxAttempts) {
-        this(answer, maxAttempts, null);
-    }
-
-    // новый, ура
     public GameSession(String answer, int maxAttempts, Dictionary dictionary) {
         if (answer == null || answer.length() != WORD_LENGTH) {
             throw new IllegalArgumentException("Передано некорректное слово. Слово должно состоять из 5-ти букв.");
@@ -35,7 +30,6 @@ public class GameSession {
         this.answer = answer.toLowerCase();
         this.maxAttempts = maxAttempts;
         this.validator = new WordValidator(dictionary);
-
     }
 
     public GameStatus getStatus() {
@@ -66,20 +60,24 @@ public class GameSession {
         return new GameSession(word, maxAttempts, dictionary);
     }
 
-    public void applyGuess(String guess) {
+    public GuessResult applyGuess(String guess) {
         if (status != GameStatus.IN_PROGRESS) {
             throw new IllegalStateException("Игра была завершена, новые попытки не принимаются.");
         }
 
-        String cleanGuess = validator.validate(guess);
+        String cleanGuess =
+                (validator != null) ? validator.validate(guess) : guess.trim().toLowerCase(Locale.ROOT);
+
+        GuessResult result = GuessResult.draw(answer, cleanGuess);
 
         attemptsUsed++;
-        attemptsHistory.add(cleanGuess.toLowerCase());
+        attemptsHistory.add(cleanGuess);
 
         if (cleanGuess.equalsIgnoreCase(answer)) {
             status = GameStatus.WIN;
         } else if (attemptsUsed >= maxAttempts) {
             status = GameStatus.LOSE;
         }
+        return result;
     }
 }

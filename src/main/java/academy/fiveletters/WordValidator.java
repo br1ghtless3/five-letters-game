@@ -2,7 +2,7 @@ package academy.fiveletters;
 
 import java.util.Locale;
 
-public class WordValidator  {
+public class WordValidator {
     private static final int WORD_LENGTH = 5;
     private final Dictionary dictionary;
 
