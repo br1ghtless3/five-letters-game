@@ -1,8 +1,16 @@
 package academy.fiveletters.mandatory.mr3;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Disabled;
+import academy.fiveletters.Dictionary;
+import academy.fiveletters.GameRunner;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Scanner;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,23 +19,52 @@ import org.junit.jupiter.api.Test;
 class MenuTest {
 
     @Test
-    @Disabled("MR3: реализуй тест и удали эту строку")
     @DisplayName("Некорректный пункт меню не роняет программу")
     void invalidMenuChoiceDoesNotCrash() {
-        fail("Тест не реализован");
+        String input = "привет\n9\n  \n2\n";
+        var outBytes = new ByteArrayOutputStream();
+        var printStream = new PrintStream(outBytes, true, StandardCharsets.UTF_8);
+        var dictionary = new Dictionary(List.of("озеро", "арбуз"));
+
+        var runner = new GameRunner(new Scanner(input), printStream, dictionary);
+
+        assertDoesNotThrow(runner::run);
+        String output = outBytes.toString(StandardCharsets.UTF_8);
+        assertTrue(output.contains("Некорректный ввод. Выберите 1 или 2."));
     }
 
     @Test
-    @Disabled("MR3: реализуй тест и удали эту строку")
     @DisplayName("Можно сыграть несколько партий подряд без перезапуска")
     void severalGamesInARow() {
-        fail("Тест не реализован");
+        String input = "1\nозеро\n1\nозеро\n2\n";
+        var outBytes = new ByteArrayOutputStream();
+        var printStream = new PrintStream(outBytes, true, StandardCharsets.UTF_8);
+        var dictionary = new Dictionary(List.of("озеро", "арбуз"));
+
+        var runner = new GameRunner(new Scanner(input), printStream, dictionary, "озеро");
+        runner.run();
+
+        String output = outBytes.toString(StandardCharsets.UTF_8);
+
+        int winsCount = output.split("Победа!", -1).length - 1;
+        assertEquals(2, winsCount);
     }
 
     @Test
-    @Disabled("MR3: реализуй тест и удали эту строку")
     @DisplayName("Детерминированный режим даёт предсказуемый вывод для автопроверки")
     void deterministicModeProducesPredictableOutput() {
-        fail("Тест не реализован");
+        String input = "1\nарбуз\nозеро\n2\n";
+        var outBytes = new ByteArrayOutputStream();
+        var printStream = new PrintStream(outBytes, true, StandardCharsets.UTF_8);
+        var dictionary = new Dictionary(List.of("озеро", "арбуз"));
+
+        var runner = new GameRunner(new Scanner(input), printStream, dictionary, "озеро");
+        runner.run();
+
+        String output = outBytes.toString(StandardCharsets.UTF_8);
+
+        assertTrue(output.contains("❌🟡❌❌🟡 арбуз"));
+        assertTrue(output.contains("Осталось попыток: 5"));
+        assertTrue(output.contains("Победа! Слово угадано за 2 попытки"));
     }
 }
